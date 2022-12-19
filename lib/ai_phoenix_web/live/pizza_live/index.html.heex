@@ -1,0 +1,52 @@
+<.header>
+  Listing Pizzas
+  <:actions>
+    <.link patch={~p"/pizzas/new"}>
+      <.button>New Pizza</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<div class="flex flex-wrap -mx-2">
+  <%= for pizza <- @pizzas do %>
+    <div class="w-1/3 px-2 mb-4">
+      <div class="max-w-sm rounded overflow-hidden shadow-lg">
+        <img class="w-full" src={pizza.image_url} alt={pizza.name} />
+        <div class="px-6 py-4">
+          <div class="font-bold text-xl mb-2"><%= pizza.name %></div>
+          <p class="text-gray-700 text-base"><%= pizza.description %></p>
+        </div>
+        <div class="px-6 py-4">
+          <div class="sr-only">
+            <.link navigate={~p"/pizzas/#{pizza}"}>Show</.link>
+          </div>
+          <.link patch={~p"/pizzas/#{pizza}/edit"}>Edit</.link>
+          <.link
+            phx-click={JS.push("delete", value: %{id: pizza.id})}
+            data-confirm="Are you sure?"
+          >
+            Delete
+          </.link>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="pizza-modal"
+  show
+  on_cancel={JS.navigate(~p"/pizzas")}
+>
+  <.live_component
+    module={AiPhoenixWeb.PizzaLive.FormComponent}
+    id={@pizza.id || :new}
+    title={@page_title}
+    action={@live_action}
+    pizza={@pizza}
+    navigate={~p"/pizzas"}
+  />
+</.modal>
